@@ -100,7 +100,8 @@ void Splashscreen() {
     BeginDrawing();
         ClearBackground(RAYWHITE);
         DrawFPS(10,10);
-        DrawTexture(raytex, ( GetScreenWidth() - raytex.width) / 2 ,GetScreenHeight() / 2.8,WHITE);
+        DrawText("MADE WITH", (GetScreenWidth() - MeasureText("MADE WITH", 48)) / 2, GetScreenHeight() / 3 - 45,48, BLACK );
+        DrawTexture(raytex, ( GetScreenWidth() - raytex.width) / 2 ,GetScreenHeight() / 3 + 45,WHITE);
         timer++;
         if (timer > 120) {
             timer = 0;
