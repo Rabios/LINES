@@ -18,7 +18,14 @@ Very hard game about avoiding a lot of moving lines,Made with raylib
 <br>
 
 ## How to play
-- Move red point with mouse
+
+### Controls
+- Mouse: Move red point with mouse
+- Keyboard: Move with arrows or WASD
+- Touch: Touch on device to move
+- Gamepad(PS3,XB360): Move with D-PAD
+
+### Gameloop
 - Foreach 5 seconds in game:
   - First 2 seconds: Be prepared to wave
   - 2 seconds later: Lasers lines drawn,With no collision detection to let you run away from lasers before they beaming
