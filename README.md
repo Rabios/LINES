@@ -22,7 +22,7 @@ Very hard game about avoiding a lot of moving lines,Made with raylib
 ### Controls
 - Mouse: Move red point with mouse
 - Keyboard: Move with arrows or WASD
-- Touch: Touch on device to move
+- Touch: Touch on screen to move
 - Gamepad(PS3,XB360): Move with D-PAD
 
 ### Gameloop
