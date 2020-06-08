@@ -30,6 +30,7 @@ int lines_to_x[LINES];
 int lines_to_y[LINES];
 float lines_size[LINES];
 Color lines_colors[LINES];
+bool lines_activated[LINES];
 
 // Game assets
 Texture2D raytex;
@@ -39,8 +40,9 @@ Font rayfont;
 int scene = 1;
 int seconds = 0;
 int timer = 0;
-int fps = 60;
 int linestimer = 0;
+int activationtimer = 0;
+int fps = 60;
 float gamespeed = 1.5f;
 int highscore = 0;
 float explosionsize = 0.0f;
@@ -144,8 +146,7 @@ void Menu() {
         DrawText(copyrightTxt, 10, GetScreenHeight() - 32,22,BLUE);
         startgamebuttonpressed = GuiButton((Rectangle){ (GetScreenWidth() - 250) / 2, GetScreenHeight() / 3 + 125,250,100 }, "PLAY");
         exitgamebuttonpressed = GuiButton((Rectangle){ (GetScreenWidth() - 250) / 2,GetScreenHeight() / 3 + 275,250,100 }, "EXIT");
-        if (startgamebuttonpressed) 
-            decrease = 2;
+        if (startgamebuttonpressed) decrease = 2;
         if (exitgamebuttonpressed) {
             UnloadResources();
             UnloadFont(rayfont);
@@ -190,6 +191,8 @@ void Game() {
             if (playery < 10) playery = 10;
             if (playerx < 5) playerx = 5; 
             DrawCircle(playerx,playery,5.0f,PURPLE);
+            timer++;
+            linestimer++;
         }
 
         explosionColor.a = 255.0f - ((explosionsize/80.0f) * 255.0f);
@@ -199,17 +202,23 @@ void Game() {
             DrawLines();          
             if (linestimer >= 240) {
                 for (int i = 0;i < LINES;i++) {
-                    lines_size[i] = 3.0f;
-                    lines_colors[i] = RED;
-                    CheckCollisions();
+                    if(activationtimer > i / 4) lines_activated[i] = true;
+                    if(lines_activated[i]) {
+                        lines_size[i] = 3.0f;
+                        lines_colors[i] = RED;
+                        CheckCollisions();
+                    }
                 }
+                activationtimer++;
             }
             if (linestimer >= 300) {
                 CheckCollisions();
                 RemakeLines();
+                activationtimer = 0;
                 linestimer = 0;
             }
             if (!alive) {
+                explosionsize += 1.0f;
                 if (linestimer >= 240)
                 {
                     for (int i = 0; i < LINES; i++)
@@ -225,10 +234,7 @@ void Game() {
             timer = 0;
             seconds++;
         }        
-        if (!alive) explosionsize += 1.0f;
         if (explosionsize > 80.0f) scene = 4;
-        if (alive) timer++;
-        if (alive) linestimer++;
     EndDrawing();
 }
 
@@ -241,28 +247,42 @@ void GameOver() {
             highscore = seconds;
             SaveStorageValue(HIGHSCORE,highscore);
         }
-        DrawText(FormatText("BEST TIME SURVIVED: %i SECONDS",LoadStorageValue(HIGHSCORE)),(GetScreenWidth() - MeasureText(FormatText("BEST TIME SURVIVED: %i SECONDS",highscore), 64)) / 2,GetScreenHeight() / 2,64,RED);       
+        DrawText(FormatText("BEST TIME SURVIVED: %i SECONDS",LoadStorageValue(HIGHSCORE),seconds),(GetScreenWidth() - MeasureText(FormatText("BEST TIME SURVIVED: %i SECONDS",highscore), 64)) / 2,GetScreenHeight() / 2,64,RED);
+        DrawText(FormatText("SURVIVED: %i SECONDS",seconds),(GetScreenWidth() - MeasureText(FormatText("SURVIVED: %i SECONDS",seconds), 32)) / 2,GetScreenHeight() / 1.6,32,RED);     
         #ifdef __ANDROID__
-            DrawText(restartTouchTxt,(GetScreenWidth() - MeasureText(restartTouchTxt, 22)) / 2,GetScreenHeight() / 1.4,22,GREEN);
-            if (GetTouchX() < GetScreenWidth() / 2) scene = 2;
+            DrawText(restartTouchTxt,(GetScreenWidth() - MeasureText(restartTouchTxt, 22)) / 2,GetScreenHeight() / 1.2,22,GREEN);
+            if (GetTouchX() < GetScreenWidth() / 2) {
+                decrease = 0;
+                scene = 2;
+            }
             if (GetTouchX() > GetScreenWidth() / 2) RestartGame();
         #elif TARGET_OS_EMBEDDED
-            DrawText(restartTouchTxt,(GetScreenWidth() - MeasureText(restartTouchTxt, 22)) / 2,GetScreenHeight() / 1.4,22,GREEN);
-            if (GetTouchX() < GetScreenWidth() / 2) scene = 2;
+            DrawText(restartTouchTxt,(GetScreenWidth() - MeasureText(restartTouchTxt, 22)) / 2,GetScreenHeight() / 1.2,22,GREEN);
+            if (GetTouchX() < GetScreenWidth() / 2) {
+                decrease = 0;
+                scene = 2;
+            }
             if (GetTouchX() > GetScreenWidth() / 2) RestartGame();
         #elif TARGET_IPHONE_SIMULATOR
-            DrawText(restartTouchTxt,(GetScreenWidth() - MeasureText(restartTouchTxt, 22)) / 2,GetScreenHeight() / 1.4,22,GREEN);
-            if (GetTouchX() < GetScreenWidth() / 2) scene = 2;
+            DrawText(restartTouchTxt,(GetScreenWidth() - MeasureText(restartTouchTxt, 22)) / 2,GetScreenHeight() / 1.2,22,GREEN);
+            if (GetTouchX() < GetScreenWidth() / 2) {
+                decrease = 0;
+                scene = 2;
+            }
             if (GetTouchX() > GetScreenWidth() / 2) RestartGame();
         #elif TARGET_OS_IPHONE
-            DrawText(restartTouchTxt,(GetScreenWidth() - MeasureText(restartTouchTxt, 22)) / 2,GetScreenHeight() / 1.4,22,GREEN);
-            if (GetTouchX() < GetScreenWidth() / 2) scene = 2;
+            DrawText(restartTouchTxt,(GetScreenWidth() - MeasureText(restartTouchTxt, 22)) / 2,GetScreenHeight() / 1.2,22,GREEN);
+            if (GetTouchX() < GetScreenWidth() / 2) {
+                decrease = 0;
+                scene = 2;
+            }
             if (GetTouchX() > GetScreenWidth() / 2) RestartGame();
         #else
-            DrawText(restartTxt,(GetScreenWidth() - MeasureText(restartTxt, 32)) / 2,GetScreenHeight() / 1.4,32,GREEN);
-            if (IsKeyPressed(KEY_SPACE)) 
+            DrawText(restartTxt,(GetScreenWidth() - MeasureText(restartTxt, 32)) / 2,GetScreenHeight() / 1.2,32,GREEN);
+            if (IsKeyPressed(KEY_SPACE)) {
                 scene = 2;
-                fade.a = 255;
+                decrease = 0;
+            }
             if (IsKeyPressed(KEY_R)) RestartGame();
         #endif     
         DrawFPS(10, 10);
@@ -281,6 +301,7 @@ void RemakeLines() {
         lines_to_y[i] = GetRandomValue(-GetScreenHeight() / 4,GetScreenHeight() * 1.5);
         lines_size[i] = 1.0f;
         lines_colors[i] = WHITE;
+        lines_activated[i] = false;
     }
 }
 
@@ -310,6 +331,7 @@ void RestartGame() {
     seconds = 0;
     timer = 0;
     linestimer = 0;
+    activationtimer = 0;
     scene = 3;
     explosionsize = 0.0f;
     alive = true;            
