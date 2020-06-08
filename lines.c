@@ -1,13 +1,11 @@
 // LINES!!!,A game made with Raylib as challenge
 // Written by Rabia Alhaffar on 7/June/2020
-// Some support got from Anata,On Raylib Discord channel (Very thankful)
-// NOTES: Works best under 1366x768
+// Special thanks to Anata at Raylib Discord channel
 
 //Libs imported
 #include "raylib.h"
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
-#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -23,7 +21,6 @@ float lines_size[LINES];
 Color lines_colors[LINES];
 
 // Game assets
-Image rayimg;
 Texture2D raytex;
 Font rayfont;
 
@@ -39,13 +36,22 @@ float explosionsize = 0.0f;
 bool alive = true;
 int playerx;
 int playery;
-int animationtimer = 0;
+
+typedef enum {
+    HIGHSCORE = 0
+} StorageData;
 
 // Buttons,As we will use Raygui
 bool startgamebuttonpressed = false;
 bool exitgamebuttonpressed = false;
 
-// Game scenes and functions
+const char * madeWithTxt = "MADE WITH";
+const char * titleTxt = "LINES!!!";
+const char * copyrightTxt = "CREATED BY RABIA ALHAFFAR!!!";
+const char * gameOverTxt = "GAME OVER";
+const char * restartTxt = "PRESS SPACE KEY TO GO MAIN MENU,OR R KEY TO RETRY";
+const char * restartgamepadTxt = "ON GAMEPAD,PRESS B BUTTON TO GO MAIN MENU,OR A BUTTON TO RETRY";
+
 void Splashscreen();
 void Menu();
 void Game();
@@ -60,34 +66,27 @@ int main(void) {
     
     // Initializing game window with antialiasing enabled
     SetConfigFlags(FLAG_MSAA_4X_HINT);
-    InitWindow(GetScreenWidth(),GetScreenHeight(),"LINES!!!");
+    InitWindow(0,0,"LINES!!!");
     
-    // If game window ready,Start game!!!
-    if (IsWindowReady()) {
-        SetWindowPosition(0,0);
-        SetTargetFPS(fps);
-        ToggleFullscreen();
-        TraceLog(LOG_INFO,"GAME LAUNCHED SUCCESSFULLY!!!\n");
-        
-        // Load game assets
-        rayimg = LoadImage("resources/raylib_logo.png");
-        raytex = LoadTextureFromImage(rayimg);
-        rayfont = LoadFont("resources/acme7wide.ttf");
-        
-        // Game loop
-        while (!WindowShouldClose()) {
-            if (scene == 1) Splashscreen();
-            if (scene == 2) Menu();
-            if (scene == 3) Game();
-            if (scene == 4) GameOver();
-        }
-    }
+    SetTargetFPS(fps);
     
-    // Else cause of error,Close game!!!
-    if ((!IsWindowReady()) || (IsWindowMinimized())) {
-        TraceLog(LOG_ERROR,"GAME FAILED TO LAUNCH,CLOSING GAME...\n");
-        CloseWindow();
-        return 0;
+    // Load game assets
+    raytex = LoadTexture("resources/raylib_logo.png");
+    rayfont = LoadFont("resources/acme7wide.ttf");
+
+    GuiSetFont(rayfont);
+    GuiSetStyle(DEFAULT, TEXT_SIZE, 48);
+    
+    // Resetting player position
+    playerx = GetScreenWidth() / 2;
+    playery = GetScreenHeight() / 2;
+    
+    // Game loop
+    while (!WindowShouldClose()) {
+        if (scene == 1) Splashscreen();
+        if (scene == 2) Menu();
+        if (scene == 3) Game();
+        if (scene == 4) GameOver();
     }
     
     // Else if ESC pressed or closed by default
@@ -96,31 +95,22 @@ int main(void) {
 }
 
 void Splashscreen() {
-    TraceLog(LOG_INFO,"SPLASHSCREEN STARTED SUCCESSFULLY!!!\n");
     BeginDrawing();
         ClearBackground(RAYWHITE);
         DrawFPS(10,10);
-        DrawText("MADE WITH", (GetScreenWidth() - MeasureText("MADE WITH", 48)) / 2, GetScreenHeight() / 3 - 45,48, BLACK );
-        DrawTexture(raytex, ( GetScreenWidth() - raytex.width) / 2 ,GetScreenHeight() / 3 + 45,WHITE);
-        timer++;
-        if (timer > 120) {
-            timer = 0;
-            scene = 2;
-            TraceLog(LOG_DEBUG,"SWITCHING TO MAIN MENU...\n");
-        }
+        DrawText(madeWithTxt, (GetScreenWidth() - MeasureText(madeWithTxt, 48)) / 2, GetScreenHeight() / 3 - 45,48, BLACK );
+        DrawTexture(raytex, ( GetScreenWidth() - raytex.width) / 2 ,GetScreenHeight() / 3 + 45,WHITE);        
+        if (timer++ > 120) scene = 2;
     EndDrawing();
 }
 
 void Menu() {
     BeginDrawing();
         ClearBackground(RAYWHITE);
-        DrawText("LINES!!!",GetScreenWidth() / 2.7f,50,96,BLACK);
-        DrawText("CREATED BY RABIA ALHAFFAR!!!",10,GetScreenHeight() - 32,32,BLUE);
-        TraceLog(LOG_DEBUG,"LOADING MAIN MENU GUI...\n");       
-        startgamebuttonpressed = GuiButton((Rectangle){ GetScreenWidth() / 3 + 100,GetScreenHeight() / 3 + 125,250,100 },"");
-        exitgamebuttonpressed = GuiButton((Rectangle){ GetScreenWidth() / 3 + 100,GetScreenHeight() / 3 + 275,250,100 },"");        
-        DrawTextEx(rayfont,"PLAY",(Vector2){ GetScreenWidth() / 3 + 170,GetScreenHeight() / 3 + 150 },48,1.0f,BLACK);
-        DrawTextEx(rayfont,"EXIT",(Vector2){ GetScreenWidth() / 3 + 175,GetScreenHeight() / 3 + 300 },48,1.0f,BLACK);       
+        DrawText(titleTxt, (GetScreenWidth() - MeasureText(titleTxt, 96)) / 2,50,96,BLACK);
+        DrawText(copyrightTxt, 10, GetScreenHeight() - 32,32,BLUE);
+        startgamebuttonpressed = GuiButton((Rectangle){ (GetScreenWidth() - 250) / 2, GetScreenHeight() / 3 + 125,250,100 },"PLAY");
+        exitgamebuttonpressed = GuiButton((Rectangle){ (GetScreenWidth() - 250) / 2,GetScreenHeight() / 3 + 275,250,100 },"EXIT");
         if (startgamebuttonpressed) ResetGame();
         if (exitgamebuttonpressed) {
             UnloadResources();
@@ -137,8 +127,36 @@ void Game() {
         ClearBackground(RAYWHITE);
         DrawText(FormatText("%is",seconds),GetScreenWidth() / 2.1,10,64,PURPLE);
         if (alive) {
-            playerx = GetMouseX();
-            playery = GetMouseY();
+            // Check OS,If mobile only use touch
+            // Else,Use Gamepad,Keyboard,Mouse (Cause OS is desktop)
+            #ifdef __ANDROID__
+                playerx = GetTouchX();
+                playery = GetTouchY();
+            #elif TARGET_OS_EMBEDDED
+                playerx = GetTouchX();
+                playery = GetTouchY();
+            #elif TARGET_IPHONE_SIMULATOR
+                playerx = GetTouchX();
+                playery = GetTouchY();
+            #elif TARGET_OS_IPHONE
+                playerx = GetTouchX();
+                playery = GetTouchY();
+            #else
+                if (IsMouseButtonDown(0)) {
+                    playerx = GetMouseX();
+                    playery = GetMouseY();                    
+                }
+                if(IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) playery -= 5;
+                if(IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) playerx -= 5;
+                if(IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) playery += 5;
+                if(IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) playerx += 5;
+                if(IsGamepadAvailable(GAMEPAD_PLAYER1)) {
+                    if(IsGamepadButtonDown(GAMEPAD_PLAYER1,GAMEPAD_BUTTON_LEFT_FACE_UP)) playery -= 5;
+                    if(IsGamepadButtonDown(GAMEPAD_PLAYER1,GAMEPAD_BUTTON_LEFT_FACE_LEFT)) playerx -= 5;
+                    if(IsGamepadButtonDown(GAMEPAD_PLAYER1,GAMEPAD_BUTTON_LEFT_FACE_DOWN)) playery += 5;
+                    if(IsGamepadButtonDown(GAMEPAD_PLAYER1,GAMEPAD_BUTTON_LEFT_FACE_RIGHT)) playerx += 5;
+                }
+            #endif
             DrawCircle(playerx,playery,5.0f,RED);
         }
         DrawCircle(playerx,playery,explosionsize,ORANGE);        
@@ -172,18 +190,26 @@ void Game() {
 void GameOver() {
     BeginDrawing();
         ClearBackground(RAYWHITE);
-        DrawText("GAME OVER",GetScreenWidth() / 4.5,GetScreenHeight() / 4,128,RED);
-        if ((seconds > highscore) || (highscore == 0)) highscore = seconds;
-        DrawText(FormatText("BEST TIME SURVIVED: %i SECONDS",highscore),GetScreenWidth() / 12.4,GetScreenHeight() / 2,64,RED);
-        DrawText("PRESS SPACE KEY TO GO MAIN MENU,OR R KEY TO RETRY",GetScreenWidth() / 7,GetScreenHeight() / 1.4,32,GREEN);
+        highscore = LoadStorageValue(HIGHSCORE);
+        DrawText(gameOverTxt, (GetScreenWidth() - MeasureText(gameOverTxt, 128)) / 2, GetScreenHeight() / 4,128,RED);
+        if ((seconds > highscore) || (highscore == 0)) {
+            highscore = seconds;
+            SaveStorageValue(HIGHSCORE,highscore);
+        }
+        DrawText(FormatText("BEST TIME SURVIVED: %i SECONDS",LoadStorageValue(HIGHSCORE)),(GetScreenWidth() - MeasureText(FormatText("BEST TIME SURVIVED: %i SECONDS",highscore), 64)) / 2,GetScreenHeight() / 2,64,RED);
+        DrawText(restartTxt,(GetScreenWidth() - MeasureText(restartTxt, 32)) / 2,GetScreenHeight() / 1.4,32,GREEN);
+        DrawText(restartgamepadTxt,(GetScreenWidth() - MeasureText(restartTxt, 24)) / 3,GetScreenHeight() / 1.2,24,GREEN);
         if (IsKeyPressed(KEY_SPACE)) scene = 2;
         if (IsKeyPressed(KEY_R)) ResetGame();
+        if (IsGamepadAvailable(GAMEPAD_PLAYER1)) {
+            if (IsGamepadButtonDown(GAMEPAD_PLAYER1,7)) ResetGame();
+            if (IsGamepadButtonDown(GAMEPAD_PLAYER1,6)) scene = 2;
+        }
         DrawFPS(10,10);
     EndDrawing();
 }
 
 void UnloadResources() {
-    UnloadImage(rayimg);
     UnloadTexture(raytex);
 }
 
@@ -207,13 +233,13 @@ void CheckCollisions() {
         float dist;
         float v1x = lines_to_x[i] - lines_from_x[i];
         float v1y = lines_to_y[i] - lines_from_y[i];
-        float v2x = GetMouseX() - lines_from_x[i];
-        float v2y = GetMouseY() - lines_from_y[i];
+        float v2x = playerx - lines_from_x[i];
+        float v2y = playery - lines_from_y[i];
         float u = (v2x * v1x + v2y * v1y) / (v1y * v1y + v1x * v1x);
-        if (u >= 0 && u <= 1) dist = pow((lines_from_x[i] + v1x * u - GetMouseX()),2) + pow((lines_from_y[i] + v1y * u - GetMouseY()),2);
+        if (u >= 0 && u <= 1) dist = pow((lines_from_x[i] + v1x * u - playerx),2) + pow((lines_from_y[i] + v1y * u - playery),2);
         else {
-            if (u < 0) dist = pow((lines_from_x[i] - GetMouseX()),2) + pow((lines_from_y[i] - GetMouseY()),2);
-            else dist = pow((lines_to_x[i] - GetMouseX()),2) + pow((lines_to_y[i] - GetMouseY()),2);
+            if (u < 0) dist = pow((lines_from_x[i] - playerx),2) + pow((lines_from_y[i] - playery),2);
+            else dist = pow((lines_to_x[i] - playerx),2) + pow((lines_to_y[i] - playery),2);
         }
         if (dist < pow(5.0f,2)) alive = false;
     }
@@ -228,4 +254,6 @@ void ResetGame() {
     explosionsize = 0.0f;
     alive = true;            
     gamespeed = 1.5f;
+    playerx = GetScreenWidth() / 2;
+    playery = GetScreenHeight() / 2;
 }
