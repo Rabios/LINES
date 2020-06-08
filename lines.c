@@ -11,7 +11,7 @@
 #include <math.h>
 
 // Lines and their properties,Changes randomoly every wave (5 seconds)
-#define LINES 125
+#define LINES 200
 
 int lines_from_x[LINES];
 int lines_from_y[LINES];
@@ -157,6 +157,8 @@ void Game() {
                     if(IsGamepadButtonDown(GAMEPAD_PLAYER1,GAMEPAD_BUTTON_LEFT_FACE_RIGHT)) playerx += 5;
                 }
             #endif
+            if (playery < 10) playery = 10;
+            if (playerx < 5) playerx = 5; 
             DrawCircle(playerx,playery,5.0f,RED);
         }
         DrawCircle(playerx,playery,explosionsize,ORANGE);        
@@ -215,10 +217,10 @@ void UnloadResources() {
 
 void RemakeLines() {
     for (int i = 0;i < LINES;i++) {
-        lines_from_x[i] = GetRandomValue(-GetScreenWidth() / 6,GetScreenWidth() * 1.5);
-        lines_from_y[i] = GetRandomValue(-GetScreenHeight() / 6,GetScreenHeight() * 1.5);
-        lines_to_x[i] = GetRandomValue(-GetScreenWidth() / 6,GetScreenWidth() * 1.5);
-        lines_to_y[i] = GetRandomValue(-GetScreenHeight() / 6,GetScreenHeight() * 1.5);
+        lines_from_x[i] = GetRandomValue(-GetScreenWidth() / 4,GetScreenWidth() * 1.5);
+        lines_from_y[i] = GetRandomValue(-GetScreenHeight() / 4,GetScreenHeight() * 1.5);
+        lines_to_x[i] = GetRandomValue(-GetScreenWidth() / 4,GetScreenWidth() * 1.5);
+        lines_to_y[i] = GetRandomValue(-GetScreenHeight() / 4,GetScreenHeight() * 1.5);
         lines_size[i] = 1.0f;
         lines_colors[i] = BLACK;
     }
