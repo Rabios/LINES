@@ -30,3 +30,8 @@ Very hard game about avoiding a lot of moving lines,Made with raylib
   - First 2 seconds: Be prepared to wave
   - 2 seconds later: Lasers lines drawn,With no collision detection to let you run away from lasers before they beaming
   - 1 second: Lasers beaming while they are moving,Avoid them or you lose!!!
+
+## Requirements
+- OpenGL version 3.3 and above
+- Small amount of RAM
+- 1 MB of available storage
