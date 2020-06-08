@@ -7,3 +7,5 @@ You can by one of these:
 - Visual improvements,Textures,Sounds,And more...
 - Or even forking game repository and tell us what you made better in the game
 - Even issues can be
+
+> Any help is treated as contributing,All thanks to you!!!
