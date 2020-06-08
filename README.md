@@ -2,30 +2,28 @@
 Very hard game about avoiding a lot of moving lines,Made with raylib
 
 ## Screenshots
-<img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(121).png">
+<img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(136).png">
 <br>
-<img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(124).png">
+<img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(137).png">
 <br>
-<img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(125).png">
+<img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(139).png">
 <br>
-<img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(126).png">
+<img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(140).png">
 <br>
-<img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(127).png">
+<img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(142).png">
 <br>
-<img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(128).png">
+<img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(146).png">
 <br>
-<img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(129).png">
+<img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(148).png">
 <br>
 
 ## How to play
 
 ### Controls
-- Mouse: Move red point with mouse
-- Keyboard: Move with arrows or WASD
-- Touch: Touch on screen to move
-- Gamepad(PS3,XB360): Move with D-PAD
+- Mouse: Move gray point with mouse,Or click to change it's position
+- Touch: Touch on screen with drag/swipe to move or tap to change gray point's position
 
-> NOTES: Keyboard movement and gamepad player movement controls removed since v0.0.3
+> NOTES: Keyboard movement and gamepad player movement controls was removed since v0.0.3
 
 ### Gameloop
 - Foreach 5 seconds in game:
@@ -36,4 +34,4 @@ Very hard game about avoiding a lot of moving lines,Made with raylib
 ## Requirements
 - OpenGL version 3.3 and above
 - Small amount of RAM
-- 1 MB of available storage
+- 2 MB of available storage
