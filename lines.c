@@ -1,7 +1,7 @@
 // LINES!!!,A game made with Raylib as challenge
 // Written by Rabia Alhaffar on 7/June/2020
-// Special thanks to Anata,ohnodario,And minus at Raylib Discord channel for some improvements,and Linux binaries
-// Last update: v0.0.3 on 8/June/2020
+// Special thanks to Anata,ohnodario,And minus at Raylib Discord channel for support,and Linux binaries
+// Last update: v0.0.4 on 8/June/2020
 
 //Libs imported
 #include "raylib.h"
@@ -30,11 +30,17 @@ int lines_to_x[LINES];
 int lines_to_y[LINES];
 float lines_size[LINES];
 Color lines_colors[LINES];
+bool lines_drawn[LINES];
 bool lines_activated[LINES];
 
 // Game assets
 Texture2D raytex;
+Texture2D gamelogo;
 Font rayfont;
+Font gamefont;
+Sound explosion;
+Sound gameover;
+Sound click;
 
 // Main variables
 int scene = 1;
@@ -66,7 +72,7 @@ void Splashscreen();
 void Menu();
 void Game();
 void GameOver();
-void UnloadResources();
+void UnloadResources(int r);
 void RemakeLines();
 void DrawLines();
 void CheckCollisions();
@@ -77,17 +83,24 @@ Rectangle Screen;
 
 int main(void) {
     
-    // Initializing game window with antialiasing enabled
+    // Initializing game window and audio device with antialiasing enabled
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     InitWindow(0,0,"LINES!!!");
+    InitAudioDevice();
     
     SetTargetFPS(fps);
     
-    // Load game assets
+    // Load game resources and unload it!!!
     raytex = LoadTexture("resources/raylib_logo.png");
+    gamelogo = LoadTexture("resources/gamelogo.png");
     rayfont = LoadFont("resources/acme7wide.ttf");
-
-    GuiSetFont(rayfont);
+    gamefont = LoadFont("resources/pixelated.ttf");
+    click = LoadSound("resources/click.wav");
+    explosion = LoadSound("resources/boom.mp3");
+    gameover = LoadSound("resources/gameover.wav");
+    
+    // GUI defaults
+    GuiSetFont(gamefont);
     GuiSetStyle(DEFAULT, TEXT_SIZE, 48);
     
     // Setting screen rectangle
@@ -103,7 +116,11 @@ int main(void) {
     }
     
     // Else if ESC pressed or closed by default
+    UnloadResources(1);
+    UnloadResources(2);
+    CloseAudioDevice();
     CloseWindow();
+    exit(0);
     return 0;
 }
 
@@ -112,12 +129,14 @@ float time = 0;
 void Splashscreen() {
     BeginDrawing();
         ClearBackground(BLACK);
-        DrawText(madeWithTxt, (GetScreenWidth() - MeasureText(madeWithTxt, 48)) / 2, GetScreenHeight() / 3 - 45,48, WHITE);
+        DrawTextEx(gamefont,madeWithTxt,(Vector2) { (GetScreenWidth() - MeasureText(madeWithTxt, 48)) / 2, GetScreenHeight() / 3 - 45 },48,2.0f,WHITE);
         DrawTexture(raytex, (GetScreenWidth() - raytex.width) / 2, GetScreenHeight() / 3 + 45, WHITE);
 
         time += 4;
         fade.a = time;
-        if (fade.a > 240) scene = 2;
+        if (fade.a > 240) {
+            scene = 2;
+        }
 
         DrawRectangleRec(Screen, fade);
         DrawFPS(10, 10);
@@ -140,22 +159,33 @@ void Menu() {
         } else {
             fade.a = 0;
         }
-
-        ClearBackground(BLACK);
-        DrawText(titleTxt, (GetScreenWidth() - MeasureText(titleTxt, 96)) / 2,50,96, WHITE);
-        DrawText(copyrightTxt, 10, GetScreenHeight() - 32,22,BLUE);
+        ClearBackground(BLACK);       
+        #ifdef __ANDROID__
+            DrawTextureEx(gamelogo,(Vector2) { (GetScreenWidth() - (gamelogo.width / 2.5)) / 2, GetScreenHeight() / 7 },0.0f,0.4f,WHITE);
+        #elif TARGET_OS_EMBEDDED
+            DrawTextureEx(gamelogo,(Vector2) { (GetScreenWidth() - (gamelogo.width / 2.5)) / 2, GetScreenHeight() / 7 },0.0f,0.4f,WHITE);
+        #elif TARGET_OS_IPHONE
+            DrawTextureEx(gamelogo,(Vector2) { (GetScreenWidth() - (gamelogo.width / 2.5)) / 2, GetScreenHeight() / 7 },0.0f,0.4f,WHITE);
+        #elif TARGET_IPHONE_SIMULATOR
+            DrawTextureEx(gamelogo,(Vector2) { (GetScreenWidth() - (gamelogo.width / 2.5)) / 2, GetScreenHeight() / 7 },0.0f,0.4f,WHITE);
+        #else
+            DrawTexture(gamelogo,(GetScreenWidth() - (gamelogo.width)) / 2, GetScreenHeight() / 7,WHITE);
+        #endif
+        DrawTextEx(gamefont,copyrightTxt,(Vector2) { 10, GetScreenHeight() - 32 },22,2.0f,BLUE);
         startgamebuttonpressed = GuiButton((Rectangle){ (GetScreenWidth() - 250) / 2, GetScreenHeight() / 3 + 125,250,100 }, "PLAY");
         exitgamebuttonpressed = GuiButton((Rectangle){ (GetScreenWidth() - 250) / 2,GetScreenHeight() / 3 + 275,250,100 }, "EXIT");
-        if (startgamebuttonpressed) decrease = 2;
+        if (startgamebuttonpressed) {
+            PlaySound(click);
+            decrease = 2;
+        }
         if (exitgamebuttonpressed) {
-            UnloadResources();
-            UnloadFont(rayfont);
+            UnloadResources(2);
+            CloseAudioDevice();
             CloseWindow();
             exit(0);
         }
 
         DrawRectangleRec(Screen, fade);
-
         DrawFPS(10,10);
     EndDrawing();
 }
@@ -194,12 +224,10 @@ void Game() {
             timer++;
             linestimer++;
         }
-
-        explosionColor.a = 255.0f - ((explosionsize/80.0f) * 255.0f);
-
-        DrawCircle(playerx,playery,explosionsize,explosionColor);        
+        explosionColor.a = 255.0f - ((explosionsize / 80.0f) * 255.0f);
+        DrawCircle(playerx,playery,explosionsize,explosionColor);      
         if (linestimer >= 120) {
-            DrawLines();          
+            DrawLines();
             if (linestimer >= 240) {
                 for (int i = 0;i < LINES;i++) {
                     if(activationtimer > i / 4) lines_activated[i] = true;
@@ -217,15 +245,15 @@ void Game() {
                 activationtimer = 0;
                 linestimer = 0;
             }
-            if (!alive) {
+            if (!alive) {      
                 explosionsize += 1.0f;
                 if (linestimer >= 240)
                 {
                     for (int i = 0; i < LINES; i++)
                     {
                         lines_size[i] = (explosionColor.a / 255.0f) * 3.0f;
-                        lines_colors[i].a = explosionColor.a;
-                    }
+                        lines_colors[i].a = explosionColor.a;                       
+                    }                    
                 }
             }
         }
@@ -234,7 +262,10 @@ void Game() {
             timer = 0;
             seconds++;
         }        
-        if (explosionsize > 80.0f) scene = 4;
+        if (explosionsize > 80.0f) {
+            PlaySound(explosion);
+            scene = 4;
+        }
     EndDrawing();
 }
 
@@ -289,8 +320,18 @@ void GameOver() {
     EndDrawing();
 }
 
-void UnloadResources() {
-    UnloadTexture(raytex);
+void UnloadResources(int r) {
+    if (r == 1) {
+        UnloadTexture(gamelogo);
+        UnloadTexture(raytex);
+    }
+    if (r == 2) {
+        UnloadFont(rayfont);
+        UnloadFont(gamefont);
+        UnloadSound(click);
+        UnloadSound(explosion);
+        UnloadSound(gameover);
+    }
 }
 
 void RemakeLines() {
@@ -301,6 +342,7 @@ void RemakeLines() {
         lines_to_y[i] = GetRandomValue(-GetScreenHeight() / 4,GetScreenHeight() * 1.5);
         lines_size[i] = 1.0f;
         lines_colors[i] = WHITE;
+        lines_drawn[i] = false;
         lines_activated[i] = false;
     }
 }
