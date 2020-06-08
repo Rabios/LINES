@@ -2,19 +2,19 @@
 Very hard game about avoiding a lot of moving lines,Made with raylib
 
 ## Screenshots
+<img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(148).png">
+<br>
+<img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(146).png">
+<br>
+<img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(140).png">
+<br>
 <img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(136).png">
 <br>
 <img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(137).png">
 <br>
 <img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(139).png">
 <br>
-<img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(140).png">
-<br>
 <img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(142).png">
-<br>
-<img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(146).png">
-<br>
-<img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(148).png">
 <br>
 
 ## How to play
