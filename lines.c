@@ -1,6 +1,6 @@
 // LINES!!!,A game made with Raylib as challenge
 // Written by Rabia Alhaffar on 7/June/2020
-// Special thanks to Anata at Raylib Discord channel
+// Special thanks to Anata and ohnodario and minus at Raylib Discord channel for improvements and Linux binaries
 
 //Libs imported
 #include "raylib.h"
