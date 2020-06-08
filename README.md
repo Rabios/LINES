@@ -25,4 +25,4 @@ Very hard game about avoiding a lot of moving lines,Made with raylib
   - 1 second: Lasers beaming while they are moving,Avoid them or you lose!!!
 
 # TODO
-- [] Ability to save highscore on device
+- [ ] Ability to save highscore on device
