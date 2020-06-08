@@ -25,7 +25,7 @@ Very hard game about avoiding a lot of moving lines,Made with raylib
 - Touch: Touch on screen to move
 - Gamepad(PS3,XB360): Move with D-PAD
 
-> NOTES: Keyboard and Gamepad support removed since v0.0.3
+> NOTES: Keyboard movement and gamepad player movement controls removed since v0.0.3
 
 ### Gameloop
 - Foreach 5 seconds in game:
