@@ -20,7 +20,7 @@ Very hard game about avoiding a lot of moving lasers,Made with raylib
 ## How to play
 
 ### Controls
-- Mouse: Move gray point with mouse,Or click to change it's position
+- Mouse: Move purple point with mouse,Or click to change it's position
 - Touch: Touch on screen with drag/swipe to move or tap to change gray point's position
 
 > NOTES: Keyboard movement and gamepad player movement controls was removed since v0.0.3
