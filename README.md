@@ -1,5 +1,5 @@
 # LINES
-Very hard game about avoiding a lot of moving lines,Made with raylib
+Very hard game about avoiding a lot of moving lasers,Made with raylib
 
 ## Screenshots
 <img src="https://github.com/Rabios/LINES/blob/master/Screenshot%20(148).png">
