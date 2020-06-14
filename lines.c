@@ -1,7 +1,7 @@
 // LINES!!!,A game made with Raylib as challenge
 // Written by Rabia Alhaffar on 7/June/2020
 // Special thanks to Anata,ohnodario,And minus at Raylib Discord channel for support,and Linux binaries
-// Last update: v0.0.4 on 8/June/2020
+// Last update: v0.0.5 on 14/June/2020
 
 //Libs imported
 #include "raylib.h"
@@ -83,12 +83,16 @@ Rectangle Screen;
 
 int main(void) {
     
-    // Initializing game window and audio device with antialiasing enabled
+    // Set flags and enable Antialiasing and VSync
+    SetConfigFlags(FLAG_VSYNC_HINT);
     SetConfigFlags(FLAG_MSAA_4X_HINT);
+    
+    // Initialize game window and audio device if microphone or speaker found
     InitWindow(0,0,"LINES!!!");
     InitAudioDevice();
     
     SetTargetFPS(fps);
+    SetTextureFilter(GetFontDefault().texture, FILTER_POINT); // Fix for HighDPI display problems
     
     // Load game resources and unload it!!!
     raytex = LoadTexture("resources/raylib_logo.png");
@@ -134,7 +138,7 @@ void Splashscreen() {
 
         time += 4;
         fade.a = time;
-        if (fade.a > 240) {
+        if (fade.a > fps * 4) {
             scene = 2;
         }
 
@@ -153,7 +157,7 @@ void Menu() {
                 decrease = 3;
         } else if (decrease == 2) {
             fade.a += 4;
-            if (fade.a > 240)
+            if (fade.a > fps * 4)
                 RestartGame();
                 RemakeLines();
         } else {
@@ -226,9 +230,9 @@ void Game() {
         }
         explosionColor.a = 255.0f - ((explosionsize / 80.0f) * 255.0f);
         DrawCircle(playerx,playery,explosionsize,explosionColor);      
-        if (linestimer >= 120) {
+        if (linestimer >= fps * 2) {
             DrawLines();
-            if (linestimer >= 240) {
+            if (linestimer >= fps * 4) {
                 for (int i = 0;i < LINES;i++) {
                     if(activationtimer > i / 4) lines_activated[i] = true;
                     if(lines_activated[i]) {
@@ -239,7 +243,7 @@ void Game() {
                 }
                 activationtimer++;
             }
-            if (linestimer >= 300) {
+            if (linestimer >= fps * 5) {
                 CheckCollisions();
                 RemakeLines();
                 activationtimer = 0;
@@ -247,7 +251,7 @@ void Game() {
             }
             if (!alive) {      
                 explosionsize += 1.0f;
-                if (linestimer >= 240)
+                if (linestimer >= fps * 4)
                 {
                     for (int i = 0; i < LINES; i++)
                     {
@@ -258,7 +262,7 @@ void Game() {
             }
         }
         DrawFPS(10,10);
-        if (timer >= 60) {
+        if (timer >= fps) {
             timer = 0;
             seconds++;
         }        
