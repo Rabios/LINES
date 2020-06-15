@@ -1,7 +1,7 @@
 // LINES!!!,A game made with Raylib as challenge
 // Written by Rabia Alhaffar on 7/June/2020
-// Special thanks to Anata,ohnodario,And minus at Raylib Discord channel for support,and Linux binaries
-// Last update: v0.0.5 on 14/June/2020
+// Special thanks to Anata,darltrash/ohnodario,And minus at Raylib Discord channel for support,and Linux binaries
+// Last update: v0.0.6 on 15/June/2020
 
 //Libs imported
 #include "raylib.h"
@@ -12,13 +12,7 @@
 #include <math.h>
 
 // Lines and their properties,Changes randomoly every wave (5 seconds)
-#ifdef __ANDROID__
-    #define LINES 75
-#elif TARGET_OS_EMBEDDED
-    #define LINES 75
-#elif TARGET_IPHONE_SIMULATOR
-    #define LINES 75
-#elif TARGET_OS_IPHONE
+#ifdef __ANDROID__ || TARGET_OS_EMBEDDED || TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
     #define LINES 75
 #else
     #define LINES 200
@@ -164,13 +158,7 @@ void Menu() {
             fade.a = 0;
         }
         ClearBackground(BLACK);       
-        #ifdef __ANDROID__
-            DrawTextureEx(gamelogo,(Vector2) { (GetScreenWidth() - (gamelogo.width / 2.5)) / 2, GetScreenHeight() / 7 },0.0f,0.4f,WHITE);
-        #elif TARGET_OS_EMBEDDED
-            DrawTextureEx(gamelogo,(Vector2) { (GetScreenWidth() - (gamelogo.width / 2.5)) / 2, GetScreenHeight() / 7 },0.0f,0.4f,WHITE);
-        #elif TARGET_OS_IPHONE
-            DrawTextureEx(gamelogo,(Vector2) { (GetScreenWidth() - (gamelogo.width / 2.5)) / 2, GetScreenHeight() / 7 },0.0f,0.4f,WHITE);
-        #elif TARGET_IPHONE_SIMULATOR
+        #ifdef __ANDROID__ || TARGET_OS_EMBEDDED || TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
             DrawTextureEx(gamelogo,(Vector2) { (GetScreenWidth() - (gamelogo.width / 2.5)) / 2, GetScreenHeight() / 7 },0.0f,0.4f,WHITE);
         #else
             DrawTexture(gamelogo,(GetScreenWidth() - (gamelogo.width)) / 2, GetScreenHeight() / 7,WHITE);
@@ -203,16 +191,7 @@ void Game() {
         if (alive) {
             // Check OS,If mobile only use touch
             // Else,Use Gamepad,Keyboard,Mouse (Cause OS is desktop)
-            #ifdef __ANDROID__
-                playerx = GetTouchX();
-                playery = GetTouchY();
-            #elif TARGET_OS_EMBEDDED
-                playerx = GetTouchX();
-                playery = GetTouchY();
-            #elif TARGET_IPHONE_SIMULATOR
-                playerx = GetTouchX();
-                playery = GetTouchY();
-            #elif TARGET_OS_IPHONE
+            #ifdef __ANDROID__ || TARGET_OS_EMBEDDED || TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
                 playerx = GetTouchX();
                 playery = GetTouchY();
             #else
@@ -284,28 +263,7 @@ void GameOver() {
         }
         DrawText(FormatText("BEST TIME SURVIVED: %i SECONDS",LoadStorageValue(HIGHSCORE),seconds),(GetScreenWidth() - MeasureText(FormatText("BEST TIME SURVIVED: %i SECONDS",highscore), 64)) / 2,GetScreenHeight() / 2,64,RED);
         DrawText(FormatText("SURVIVED: %i SECONDS",seconds),(GetScreenWidth() - MeasureText(FormatText("SURVIVED: %i SECONDS",seconds), 32)) / 2,GetScreenHeight() / 1.6,32,RED);     
-        #ifdef __ANDROID__
-            DrawText(restartTouchTxt,(GetScreenWidth() - MeasureText(restartTouchTxt, 22)) / 2,GetScreenHeight() / 1.2,22,GREEN);
-            if (GetTouchX() < GetScreenWidth() / 2) {
-                decrease = 0;
-                scene = 2;
-            }
-            if (GetTouchX() > GetScreenWidth() / 2) RestartGame();
-        #elif TARGET_OS_EMBEDDED
-            DrawText(restartTouchTxt,(GetScreenWidth() - MeasureText(restartTouchTxt, 22)) / 2,GetScreenHeight() / 1.2,22,GREEN);
-            if (GetTouchX() < GetScreenWidth() / 2) {
-                decrease = 0;
-                scene = 2;
-            }
-            if (GetTouchX() > GetScreenWidth() / 2) RestartGame();
-        #elif TARGET_IPHONE_SIMULATOR
-            DrawText(restartTouchTxt,(GetScreenWidth() - MeasureText(restartTouchTxt, 22)) / 2,GetScreenHeight() / 1.2,22,GREEN);
-            if (GetTouchX() < GetScreenWidth() / 2) {
-                decrease = 0;
-                scene = 2;
-            }
-            if (GetTouchX() > GetScreenWidth() / 2) RestartGame();
-        #elif TARGET_OS_IPHONE
+        #ifdef __ANDROID__ || TARGET_OS_EMBEDDED || TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
             DrawText(restartTouchTxt,(GetScreenWidth() - MeasureText(restartTouchTxt, 22)) / 2,GetScreenHeight() / 1.2,22,GREEN);
             if (GetTouchX() < GetScreenWidth() / 2) {
                 decrease = 0;
