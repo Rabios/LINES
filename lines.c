@@ -24,7 +24,6 @@ int lines_to_x[LINES];
 int lines_to_y[LINES];
 float lines_size[LINES];
 Color lines_colors[LINES];
-bool lines_drawn[LINES];
 bool lines_activated[LINES];
 
 // Game assets
@@ -81,8 +80,9 @@ int main(void) {
     SetConfigFlags(FLAG_VSYNC_HINT);
     SetConfigFlags(FLAG_MSAA_4X_HINT);
     
-    // Initialize game window and audio device if microphone or speaker found
+    // Initialize game window in fullscreen and audio device if microphone or speaker found
     InitWindow(0,0,"LINES!!!");
+    ToggleFullscreen();
     InitAudioDevice();
     
     SetTargetFPS(fps);
@@ -132,9 +132,7 @@ void Splashscreen() {
 
         time += 4;
         fade.a = time;
-        if (fade.a > fps * 4) {
-            scene = 2;
-        }
+        if (fade.a > fps * 4) scene = 2;
 
         DrawRectangleRec(Screen, fade);
         DrawFPS(10, 10);
@@ -147,16 +145,14 @@ void Menu() {
     BeginDrawing();
         if (decrease == 1) {
             fade.a -= 4;
-            if (fade.a < 1)
-                decrease = 3;
+            if (fade.a < 1) decrease = 3;
         } else if (decrease == 2) {
             fade.a += 4;
             if (fade.a > fps * 4)
                 RestartGame();
                 RemakeLines();
-        } else {
-            fade.a = 0;
-        }
+        } else fade.a = 0;
+   
         ClearBackground(BLACK);       
         #ifdef __ANDROID__ || TARGET_OS_EMBEDDED || TARGET_IPHONE_SIMULATOR || TARGET_OS_IPHONE
             DrawTextureEx(gamelogo,(Vector2) { (GetScreenWidth() - (gamelogo.width / 2.5)) / 2, GetScreenHeight() / 7 },0.0f,0.4f,WHITE);
@@ -304,7 +300,6 @@ void RemakeLines() {
         lines_to_y[i] = GetRandomValue(-GetScreenHeight() / 4,GetScreenHeight() * 1.5);
         lines_size[i] = 1.0f;
         lines_colors[i] = WHITE;
-        lines_drawn[i] = false;
         lines_activated[i] = false;
     }
 }
